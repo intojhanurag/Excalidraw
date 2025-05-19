@@ -4,10 +4,7 @@ import { JWT_SECRET } from "@repo/backend-common/config";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-
-export interface customRequest extends Request {
-  userId?: string;
-}
+import { customRequest } from "../../../types"; 
 export function middleware(req:customRequest,res:Response,next:NextFunction){
 
     const token=req.headers["authorization"]??""
