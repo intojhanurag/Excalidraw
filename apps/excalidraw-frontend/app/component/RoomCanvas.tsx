@@ -6,6 +6,7 @@ import { initDraw } from "../draw";
 import { useEffect, useRef, useState } from "react";
 import { Canvas } from "./Canvas";
 
+
 export function RoomCanvas({roomId}: {roomId: string}) {
     const [socket, setSocket] = useState<WebSocket | null>(null);
 
