@@ -22,20 +22,24 @@ app.post("/signup", async (req, res) => {
         })
         return;
     }
+    console.log(parsedData.data.email)
+    console.log(parsedData.data.name)
+    console.log(parsedData.data.password)
+
     try {
         const hashedPassword=await bcrypt.hash(parsedData.data.password,10)
         const user = await prismaClient.user.create({
             
             data: {
-                email: parsedData.data?.username,
-                
-
+                email: parsedData.data?.email,
                 password: hashedPassword,
                 name: parsedData.data.name
             }
         })
+        console.log(user.id)
         res.json({
             userId: user.id
+            
         })
     } catch(e) {
         res.status(411).json({
