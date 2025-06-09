@@ -1,6 +1,43 @@
 
 "use client"
-export default function Signup(){
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function Signin(){
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const router = useRouter();
+
+  async function handleSignin(e:React.FormEvent){
+    e.preventDefault();
+
+    setMessage("");
+
+    try {
+      const res = await fetch("http://localhost:3001/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        setMessage("Signin successful! Redirecting...");
+        setTimeout(() => {
+          router.push("/canvas/123"); // or your dashboard route
+        }, 1200);
+      } else {
+        setMessage(data.message || "Signin failed.");
+      }
+    } catch (err) {
+      setMessage("Network error.");
+    }
+
+
+  }
+
  return (
   <div className="fixed inset-0 flex items-center justify-center bg-black">
     <div className="w-full mt-16 mb-16 max-w-md bg-black shadow sm:rounded-lg flex justify-center">
@@ -38,34 +75,54 @@ export default function Signup(){
             </div>
             <div className="mx-auto max-w-xs">
               
-              <input
-                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                type="email" placeholder="Email" />
-              <input
-                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                type="password" placeholder="Password" />
-              <button
-                className="mt-5 tracking-wide font-semibold bg-green-400 text-white-500 w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
-                <svg className="w-6 h-6 -ml-2" fill="none" stroke="currentColor" strokeWidth="2"
-                  strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                  <circle cx="8.5" cy="7" r="4" />
-                  <path d="M20 8v6M23 11h-6" />
-                </svg>
-                <span>
-                  Sign in
-                </span>
-              </button>
-              <p className="mt-6 text-xs text-gray-600 text-center">
-                I agree to abide by Cartesian Kinetics
-                <a href="#" className="border-b border-gray-500 border-dotted">
-                  Terms of Service
-                </a>
-                and its
-                <a href="#" className="border-b border-gray-500 border-dotted">
-                  Privacy Policy
-                </a>
-              </p>
+              <form onSubmit={handleSignin}>
+                    
+                    <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    />
+                    <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    />
+                    
+                    <button
+                    type="submit"
+                    className="mt-5 tracking-wide font-semibold bg-green-400 text-white-500 w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                    >
+                        <svg className="w-6 h-6 -ml-2" fill="none" stroke="currentColor" strokeWidth="2"
+                            strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                            <circle cx="8.5" cy="7" r="4" />
+                            <path d="M20 8v6M23 11h-6" />
+                        </svg>
+                        <span>
+                            Sign in
+                        </span>
+                    </button>
+                    {message && (
+                    <div className="mt-4 text-center text-sm text-red-400">{message}</div>
+                    )}
+                    
+                    <p className="mt-6 text-xs text-gray-600 text-center">
+                        I agree to abide by Cartesian Kinetics
+                        <a href="#" className="border-b border-gray-500 border-dotted">
+                        Terms of Service
+                        </a>
+                        and its
+                        <a href="#" className="border-b border-gray-500 border-dotted">
+                        Privacy Policy
+                        </a>
+                    </p>
+                </form>
             </div>
           </div>
         </div>

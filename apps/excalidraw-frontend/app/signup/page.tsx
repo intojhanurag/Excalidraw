@@ -32,6 +32,7 @@ async function handleSignup(e:React.FormEvent) {
         const data=await res.json()
 
         if (res.ok && data.userId) {
+            localStorage.setItem("token", data.token);
             setMessage("Signup successful! You can now sign in.");
             setName("");
             
