@@ -49,7 +49,7 @@ app.post("/signup", async (req, res) => {
 
 app.post("/signin", async (req, res) => {
     const parsedData = SigninSchema.safeParse(req.body);
-    console.log(parsedData);
+    
     if (!parsedData.success) {
         res.json({
             message: "Incorrect inputs"
@@ -64,7 +64,7 @@ app.post("/signin", async (req, res) => {
            
         }
     })
-    console.log("Found user:", user);
+   
     if (!user||!(await bcrypt.compare(parsedData.data.password,user.password))) {
         res.status(403).json({
             message: "Not authorized"
@@ -115,7 +115,7 @@ app.post("/room", middleware, async (req, res) => {
 app.get("/chats/:roomId", async (req, res) => {
     try {
         const roomId = Number(req.params.roomId);
-        console.log(req.params.roomId);
+       
         const messages = await prismaClient.chat.findMany({
             where: {
                 roomId: roomId
@@ -130,7 +130,7 @@ app.get("/chats/:roomId", async (req, res) => {
             messages
         })
     } catch(e) {
-        console.log(e);
+        
         res.json({
             messages: []
         })
