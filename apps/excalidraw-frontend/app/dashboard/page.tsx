@@ -1,17 +1,57 @@
 "use client"
 import { FiPlus } from 'react-icons/fi';         // Feather Plus
-import { FiUsers } from 'react-icons/fi';
+import { FiUsers,FiCopy,FiEdit2,FiClock } from 'react-icons/fi';
 import { Card } from '../component/Card';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 
 export default function dashboard(){
 
     const [openModal,setOpenModal]=useState<"create"|"join"|null>(null);
-    
+    const [rooms,setRooms]=useState<any[]>([]);
+    const [copied,setCopied]=useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const savedRooms = localStorage.getItem("rooms");
+        if (savedRooms) {
+            setRooms(JSON.parse(savedRooms));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem("rooms", JSON.stringify(rooms));
+    }, [rooms]);
+
+    function handleCreateRoom(roomName:string){
+        const newRoom={
+            name:roomName,
+            createdAt:new Date().toLocaleString(),
+            id:Math.random().toString(36).slice(2,10),
+            people:Math.floor(Math.random()*10)+1,
+
+        };
+        setRooms(prev=>[...prev,newRoom])
+    }
+
+    function handleCopy(roomId:string){
+        navigator.clipboard.writeText(roomId);
+        setCopied(true);
+        setTimeout(()=>setCopied(false),1500)
+        
+    }
     return (
         <div>
+             {copied && (
+                <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
+                    <div className="bg-green-600 text-white px-6 py-3 rounded shadow transition">
+                    Room ID copied!
+                    </div>
+                </div>
+            )}
             <div className='flex justify-between items-center px-4 py-4'>
-                <span className=' text-2xl font-kalam'>CoSketch</span>
+                <span className=' text-2xl font-kalam cursor-pointer' onClick={()=>router.push("/")}>CoSketch</span>
                 <div className='flex gap-2'>
                     <button className='bg-black text-white rounded-sm p-2' onClick={()=>setOpenModal("create")}>Create Room</button>
                     <button className='bg-white shadow border border-black text-black rounded-sm p-2'>Logout</button>
@@ -47,8 +87,43 @@ export default function dashboard(){
             <div className='pt-20 p-4 rounded-xl'>
                 <div className='border shadow p-4'>
                     <h1 className=' font-semibold '>Your Rooms</h1>
-
+            
                 </div>
+                
+                {rooms.map(room=>(
+                    <div className='border shadow p-4 flex justify-between'>
+                        
+                        <div className='flex items-center gap-4 '>
+                            <FiEdit2/>
+                            <div>
+                                <div className='font-bold'>
+                                    {room.name}
+                                </div>
+                                <div className='flex flex-col md:flex-row md:items-center text-sm'>
+                                    <div className='flex items-center'>
+                                        <FiClock className='hidden md:inline'/>
+                                        <span className='pl-2 hidden md:inline'>Created {room.createdAt}</span>
+                                    </div>
+                                    <div className='flex items-center'>
+                                        <span className='md:pl-4 pr-2'>RoomId: {room.id}</span>
+                                        <FiCopy className='cursor-pointer' onClick={()=>handleCopy(room.id)}/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div className='flex items-center'>
+                            <FiUsers/>
+                            <span>{room.people}</span>
+                            <button className='text-blue-600 pl-6 cursor-pointer'>
+                                Join
+                            </button>
+
+                        </div>
+                    </div>
+                ))}
+                
             </div>
 
             {openModal && (
@@ -56,8 +131,11 @@ export default function dashboard(){
                     <Card
                         heading={openModal === "create" ? "Create New Room" : "Join Existing Room"}
                         onCancel={() => setOpenModal(null)}
-                        onCreate={roomId => {
+                        onCreate={roomName => {
                             // handle create/join logic here
+                            if(openModal==="create"){
+                                handleCreateRoom(roomName)
+                            }
                             setOpenModal(null);
                         }}
                         createLabel={openModal === "create" ? "Create" : "Join"}

@@ -1,129 +1,87 @@
+"use client"
+
 import { Button } from "@repo/ui/button";
 import { Card } from "@repo/ui/card";
-import { Pencil, Share2, Users2, Sparkles, Github, Download } from "lucide-react";
+import { Pencil, Share2, Users2, Sparkles, Github, Download,Menu,X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function App() {
-  return ( 
-    <div className="min-h-screen bg-background relative">
-      
-      {/* Hero Section */}
-      <header className="relative overflow-hidden">
-        <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl text-foreground">
-              Collaborative Whiteboarding
-              <span className="text-primary block">Made Simple</span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-              Create, collaborate, and share beautiful diagrams and sketches with our intuitive drawing tool. 
-              No sign-up required.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Link href={"/signin"}>
-                <Button variant={"primary"} size="lg" className="h-12 px-6 ">
-                  Sign in
-                  <Pencil className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/signup">
-                <Button variant="outline" size="lg" className="h-12 px-6 ">
-                  Sign up
-                </Button>
-              </Link>
-            </div>
-          </div>
+  const router=useRouter();
+  const [menuOpen,setMenuOpen]=useState(false)
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth >= 640) { // 640px is Tailwind's 'sm'
+        setMenuOpen(false);
+      }
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <div>
+      <header className="flex justify-between rounded-md  mt-8 m-8  border border-gray-200 p-2 md:p-4 shadow-2xl md:pl-6 md:ml-24 md:mr-24 md:pr-6">
+        <div>
+          <span className=' text-2xl font-kalam cursor-pointer' onClick={()=>router.push("/")}>CoSketch</span>
         </div>
+        <div className="hidden sm:flex gap-5 items-center">
+          <span className="cursor-pointer">Features</span>
+          <span className="cursor-pointer">Github</span>
+          <span className="cursor-pointer">Signin</span>
+          <span className="bg-black text-white rounded-lg px-2 py-1 pt-1 text-sm cursor-pointer">Try Now</span>
+
+        </div>
+        { !menuOpen && (
+            <button className="sm:hidden p-2" onClick={()=>setMenuOpen(true)}
+              aria-label="Open menu">
+              <Menu className="w-7 h-7"/>
+              
+            </button>
+
+          )
+        }
+        
+        { menuOpen && (
+            <button className="sm:hidden p-2" onClick={()=>setMenuOpen(false)}
+              aria-label="Close menu">
+              <X className="w-7 h-7"/>
+            </button>
+        )
+        }
       </header>
+      { menuOpen && (
+          <div className="flex-col gap-4 border rounded-xl shadow-2xl m-8 p-2">
+            <div className="font-medium cursor-pointer">Features</div>
+            <div className="font-medium cursor-pointer">Github</div>
+            <div className="font-medium cursor-pointer">Signin</div>
+            <div className="font-medium cursor-pointer">Try Now</div>
 
-      {/* Features Section */}
-      <section className="py-24 bg-muted/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
-            <Card className="p-6 border-2 hover:border-primary transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Share2 className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold">Real-time Collaboration</h3>
-              </div>
-              <p className="mt-4 text-muted-foreground">
-                Work together with your team in real-time. Share your drawings instantly with a simple link.
-              </p>
-            </Card>
-
-            <Card className="p-6 border-2 hover:border-primary transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Users2 className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold">Multiplayer Editing</h3>
-              </div>
-              <p className="mt-4 text-muted-foreground">
-                Multiple users can edit the same canvas simultaneously. See who's drawing what in real-time.
-              </p>
-            </Card>
-
-            <Card className="p-6 border-2 hover:border-primary transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold">Smart Drawing</h3>
-              </div>
-              <p className="mt-4 text-muted-foreground">
-                Intelligent shape recognition and drawing assistance helps you create perfect diagrams.
-              </p>
-            </Card>
           </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-primary rounded-3xl p-8 sm:p-16">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                Ready to start creating?
-              </h2>
-              <p className="mx-auto mt-6 max-w-xl text-lg text-primary-foreground/80">
-                Join thousands of users who are already creating amazing diagrams and sketches.
-              </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Button size="lg" variant="secondary" className="h-12 px-6">
-                  Open Canvas
-                  <Pencil className="ml-2 h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="lg" className="h-12 px-6 bg-transparent text-primary-foreground border-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                  View Gallery
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        )
+      }
+      <div className="text-center mt-24">
+        <div className="text-4xl md:text-6xl">
+          <span className="font-bold">Ideas </span>
+           don't wait
 
-      {/* Footer */}
-      <footer className="border-t">
-        <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              © 2024 Excalidraw Clone. All rights reserved.
-            </p>
-            <div className="flex space-x-6">
-              <a href="https://github.com" className="text-muted-foreground hover:text-primary">
-                <Github className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary">
-                <Download className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
         </div>
-      </footer>
+        <div className="text-4xl md:text-6xl">
+          why should you? Go Instantly
+        </div>
+        <div className="mt-4 text-xl">
+          Create, connect, and collaborate the moment inspiration strikes.
+          
+        </div>
+
+      </div>
+
     </div>
-  );
+  )
+    
 }
 
 export default App;
