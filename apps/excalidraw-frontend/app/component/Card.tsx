@@ -12,7 +12,7 @@ export function Card({ heading, onCancel, onCreate, createLabel = "Create" }: Ca
     const [roomId,setRoomId]=useState("");
 
     return (
-        <div className="bg-white p-8 rounded-sm">
+        <div className="bg-white p-8 border rounded-2xl">
             <h1 className="text-xl font-bold mb-4">{heading}</h1>
             <span className="text-gray-500 text-sm">Enter Room Name</span>
             <label className="block text-gray-700 mb-2"></label>
