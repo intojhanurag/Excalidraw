@@ -58,7 +58,7 @@ function App() {
             <div className="font-medium cursor-pointer">Features</div>
             <div className="font-medium cursor-pointer">Github</div>
             <div className="font-medium cursor-pointer">Signin</div>
-            <div className="font-medium cursor-pointer">Try Now</div>
+            <div className="font-medium cursor-pointer" onClick={()=>(router.push("/signin"))}>Try Now</div>
 
           </div>
 
@@ -78,7 +78,7 @@ function App() {
           
         </div>
         <div>
-          <button className="bg-black text-white p-2 rounded-xl m-4">StartDrawing</button>
+          <button className="bg-black text-white p-2 rounded-xl m-4" onClick={()=>router.push("/signin")}>StartDrawing</button>
           <button className="bg-white text-black border border-black p-2 rounded-xl m-4">WatchDemo</button>
         </div>
 
@@ -157,9 +157,9 @@ function App() {
 
       </div>
       <div className="flex justify-center mt-5">
-        <button className="text-white bg-black p-2 rounded-2xl">
+        <span className="text-white bg-black p-2 rounded-2xl cursor-pointer" onClick={()=>router.push("/signin")}>
           Join free today
-        </button>
+        </span>
       </div>
       <div className="relative flex items-center justify-center w-full my-8">
         <hr className="w-[60%] h-1 bg-gray-200 border-0 rounded-sm dark:bg-gray-700" />

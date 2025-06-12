@@ -26,12 +26,19 @@ export default function Signin(){
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
+
+
       if (res.ok && data.token) {
+        // Set cookie for 7 days, accessible to all paths
+        document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
+        localStorage.setItem("token", data.token); // (optional, for client use)
         setMessage("Signin successful! Redirecting...");
         setTimeout(() => {
-          router.push("/dashboard"); // or your dashboard route
+          router.push("/dashboard");
         }, 1200);
-      } else {
+      }
+      
+      else {
         setMessage(data.message || "Signin failed.");
       }
     } catch (err) {
@@ -94,10 +101,6 @@ export default function Signin(){
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
-
-                       
-
-                   
                     <button
                     type="submit"
                     className="mt-5 tracking-wide font-semibold bg-green-400 text-white-500 w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"

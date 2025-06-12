@@ -67,8 +67,13 @@ export class Game{
             const message = JSON.parse(event.data);
 
             if (message.type == "chat") {
-                const parsedShape = JSON.parse(message.message)
-                this.existingShapes.push(parsedShape.shape)
+                let parsedShape;
+                if (typeof message.message === "string") {
+                    parsedShape = JSON.parse(message.message);
+                } else {
+                    parsedShape = message.message;
+                }
+                this.existingShapes.push(parsedShape.shape);
                 this.clearCanvas();
             }
         }

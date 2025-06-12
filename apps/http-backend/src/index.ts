@@ -11,6 +11,17 @@ const app = express();
 app.use(express.json());
 app.use(cors())
 
+function generateRoomCode(length=8)
+{
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+
+}
+
 app.post("/signup", async (req, res) => {
 
     const parsedData = CreateUserSchema.safeParse(req.body);
@@ -20,8 +31,7 @@ app.post("/signup", async (req, res) => {
             message: "Incorrect inputs"
         })
         return;
-    }
-
+    }    
     try {
         const hashedPassword=await bcrypt.hash(parsedData.data.password,10)
        
@@ -94,9 +104,11 @@ app.post("/room", middleware, async (req, res) => {
     const userId = req.userId;
 
     try {
+        const roomCode=generateRoomCode();
         const room = await prismaClient.room.create({
             data: {
-                slug: parsedData.data.name,
+                slug:roomCode,
+                name:parsedData.data.name,
                 adminId: userId
             }
         })
@@ -136,6 +148,17 @@ app.get("/chats/:roomId", async (req, res) => {
         })
     }
     
+})
+
+app.get("/my-rooms",middleware,async(req,res)=>{
+    //@ts-ignore
+    const userId=req.userId;
+    console.log(userId);
+
+    const rooms=await prismaClient.room.findMany({
+        where:{adminId:userId}
+    });
+    res.json({rooms});
 })
 
 app.get("/room/:slug", async (req, res) => {

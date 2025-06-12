@@ -35,10 +35,23 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
     socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
 
-        if (message.type == "chat") {
-            const parsedShape = JSON.parse(message.message)
-            existingShapes.push(parsedShape.shape)
-            clearCanvas(existingShapes, canvas, ctx);
+         if (message.type == "chat") {
+            let parsedShape;
+            if (typeof message.message === "string") {
+                try {
+                    parsedShape = JSON.parse(message.message);
+                } catch (e) {
+                    // If parsing fails, skip this message
+                    console.warn("Could not parse message.message as JSON:", message.message);
+                    return;
+                }
+            } else {
+                parsedShape = message.message;
+            }
+            if (parsedShape && parsedShape.shape) {
+                existingShapes.push(parsedShape.shape);
+                clearCanvas(existingShapes, canvas, ctx);
+            }
         }
     }
     

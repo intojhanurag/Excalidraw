@@ -4,7 +4,7 @@ import { useState } from "react";
 interface CardProps{
     heading:string;
     onCancel?:()=>void
-    onCreate?:(roomId:string)=>void
+    onCreate?:(roomName:string)=>void
     createLabel?:string
 }
 

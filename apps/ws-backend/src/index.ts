@@ -24,6 +24,7 @@ function checkUser(token:string):string|null{
         if(!decoded||!decoded.userId){
         return null
         }
+                
         return decoded.userId;
     } catch(e){
         return null

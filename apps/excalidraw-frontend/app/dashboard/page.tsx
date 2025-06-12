@@ -24,16 +24,56 @@ export default function dashboard(){
         localStorage.setItem("rooms", JSON.stringify(rooms));
     }, [rooms]);
 
-    function handleCreateRoom(roomName:string){
-        const newRoom={
-            name:roomName,
-            createdAt:new Date().toLocaleString(),
-            id:Math.random().toString(36).slice(2,10),
-            people:Math.floor(Math.random()*10)+1,
+    async function handleCreateRoom(roomName:string){
+        const token=localStorage.getItem("token");
 
-        };
-        setRooms(prev=>[...prev,newRoom])
+        const res=await fetch("http://localhost:3001/room",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                Authorization:`Bearer ${token}`
+            },
+            body:JSON.stringify({name:roomName})
+        })
+
+        const data=await res.json();
+
+        if(res.ok && data.roomId){
+            console.log(data.roomId)
+            fetchRooms();
+        }else{
+            alert(data.message||"Room creation failed")
+        }
     }
+
+    async function  handleJoinRoom(roomSlug:string) {
+        const res=await fetch(`http://localhost:3001/room/${roomSlug}`)
+        const data=await res.json();
+
+        if(data.room){
+
+            router.push(`/canvas/${data.room.id}`);
+        }else{
+            alert("Room not found")
+        }
+        
+    }
+
+    async function  fetchRooms() {
+        const token=localStorage.getItem("token");
+        const res=await fetch("http://localhost:3001/my-rooms",{
+            headers:{Authorization:`Bearer ${token}`}
+        })
+
+        const data=await res.json();
+
+        setRooms(data.rooms||[])
+        
+    }
+
+    useEffect(()=>{
+        fetchRooms();
+    },[])
 
     function handleCopy(roomId:string){
         navigator.clipboard.writeText(roomId);
@@ -102,7 +142,7 @@ export default function dashboard(){
                                 <div className='flex flex-col md:flex-row md:items-center text-sm'>
                                     <div className='flex items-center'>
                                         <FiClock className='hidden md:inline'/>
-                                        <span className='pl-2 hidden md:inline'>Created {room.createdAt}</span>
+                                        <span className='pl-2 hidden md:inline'>Created {room.createAt?new Date(room.createAt).toLocaleString():""}</span>
                                     </div>
                                     <div className='flex items-center'>
                                         <span className='md:pl-4 pr-2'>RoomId: {room.id}</span>
@@ -116,7 +156,7 @@ export default function dashboard(){
                         <div className='flex items-center'>
                             <FiUsers/>
                             <span>{room.people}</span>
-                            <button className='text-blue-600 pl-6 cursor-pointer'>
+                            <button className='text-blue-600 pl-6 cursor-pointer' onClick={()=>router.push(`/canvas/${room.id}`)}>
                                 Join
                             </button>
 
@@ -135,6 +175,8 @@ export default function dashboard(){
                             // handle create/join logic here
                             if(openModal==="create"){
                                 handleCreateRoom(roomName)
+                            } else if(openModal==="join"){
+                                handleJoinRoom(roomName);
                             }
                             setOpenModal(null);
                         }}

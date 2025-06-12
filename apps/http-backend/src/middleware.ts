@@ -1,20 +1,31 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
+import { isArrayTypeNode } from "typescript";
 
 
 export function middleware(req: Request, res: Response, next: NextFunction) {
-    const token = req.headers["authorization"] ?? "";
+    const authHeader = req.headers["authorization"]
+    if(!authHeader||!authHeader.startsWith("Bearer ")){
+        res.status(401).json({message:"No token provided"})
+        return;
+    }
+    
+    const token=authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!token) {
+        res.status(401).json({ message: "No token provided" });
+        return;
+    }
 
-    if (decoded) {
-        // @ts-ignore
-        req.userId = decoded.userId;
+    try{
+        const decoded = jwt.verify(token, JWT_SECRET) as unknown as { userId: number };
+
+        //@ts-ignore
+        req.userId=decoded.userId;
         next();
-    } else {
-        res.status(403).json({
-            message: "Unauthorized"
-        })
+    }catch (e) {
+        res.status(403).json({ message: "Unauthorized" });
+        return;
     }
 }
