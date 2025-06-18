@@ -2,7 +2,7 @@ import { WebSocketServer,WebSocket } from "ws";
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { JWT_SECRET } from "@repo/backend-common/config";
 import {prismaClient} from "@repo/db/client"
-import { NUMBER } from "sequelize";
+
 const wss=new WebSocketServer({port:8080});
 
 interface User{
@@ -68,12 +68,10 @@ wss.on('connection',function connection(ws,request){
             const user=users.find(x=>x.ws===ws);
             if(!user)
                 return
-            user.rooms=user?.rooms.filter(x=>x===parsedData.room);
+            user.rooms=user?.rooms.filter(x=>x!==parsedData.room);
 
         }
-        console.log("message received")
-        console.log(parsedData);
-
+       
 
         if(parsedData.type==="chat"){
             const roomId=parsedData.roomId;

@@ -1,15 +1,23 @@
 
 
+import { CanvasProtectedRoute } from "@/app/component/CanvasProtectedRoute";
 import { RoomCanvas } from "@/app/component/RoomCanvas"
 
+interface PageProps {
+  params: {
+    roomId: string;
+  };
+}
 
-export default function CanvasPage({params}:{
-    params:{
-        roomId:string
-    }
-}){
-    const roomId=(params).roomId
+
+export default function CanvasPage({params}:PageProps){
     
-    return <RoomCanvas roomId={roomId}/>
+    const roomId=params.roomId
+    
+    return (
+      <CanvasProtectedRoute roomId={roomId}>
+        <RoomCanvas roomId={roomId}/>
+      </CanvasProtectedRoute>
+    )
     
 }

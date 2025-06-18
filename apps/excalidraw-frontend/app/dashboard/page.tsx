@@ -4,6 +4,7 @@ import { FiUsers,FiCopy,FiEdit2,FiClock } from 'react-icons/fi';
 import { Card } from '../component/Card';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ProtectedRoute } from '../component/ProtectedRoute';
 
 
 export default function dashboard(){
@@ -20,6 +21,7 @@ export default function dashboard(){
         }
     }, []);
 
+    
     useEffect(() => {
         localStorage.setItem("rooms", JSON.stringify(rooms));
     }, [rooms]);
@@ -52,7 +54,7 @@ export default function dashboard(){
 
         if(data.room){
 
-            router.push(`/canvas/${data.room.id}`);
+            router.push(`/canvas/${data.room.slug}`);
         }else{
             alert("Room not found")
         }
@@ -82,7 +84,8 @@ export default function dashboard(){
         
     }
     return (
-        <div>
+        <ProtectedRoute>
+            <div>
              {copied && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
                     <div className="bg-green-600 text-white px-6 py-3 rounded shadow transition">
@@ -145,7 +148,7 @@ export default function dashboard(){
                                         <span className='pl-2 hidden md:inline'>Created {room.createAt?new Date(room.createAt).toLocaleString():""}</span>
                                     </div>
                                     <div className='flex items-center'>
-                                        <span className='md:pl-4 pr-2'>RoomId: {room.id}</span>
+                                        <span className='md:pl-4 pr-2'>Room Code: {room.slug}</span>
                                         <FiCopy className='cursor-pointer' onClick={()=>handleCopy(room.id)}/>
                                     </div>
                                 </div>
@@ -156,7 +159,7 @@ export default function dashboard(){
                         <div className='flex items-center'>
                             <FiUsers/>
                             <span>{room.people}</span>
-                            <button className='text-blue-600 pl-6 cursor-pointer' onClick={()=>router.push(`/canvas/${room.id}`)}>
+                            <button className='text-blue-600 pl-6 cursor-pointer' onClick={()=>router.push(`/canvas/${room.slug}`)}>
                                 Join
                             </button>
 
@@ -185,5 +188,8 @@ export default function dashboard(){
                 </div>
             )}
         </div>
+
+        </ProtectedRoute>
+        
     )
 }
