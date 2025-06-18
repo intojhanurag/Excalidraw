@@ -14,6 +14,12 @@ export default function dashboard(){
     const [copied,setCopied]=useState(false);
     const router = useRouter();
 
+    const handleLogout = () => {
+    localStorage.removeItem("token");
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    router.replace("/"); // or router.push("/")
+    };
+
     useEffect(() => {
         const savedRooms = localStorage.getItem("rooms");
         if (savedRooms) {
@@ -97,7 +103,7 @@ export default function dashboard(){
                 <span className=' text-2xl font-kalam cursor-pointer' onClick={()=>router.push("/")}>CoSketch</span>
                 <div className='flex gap-2'>
                     <button className='bg-black text-white rounded-sm p-2' onClick={()=>setOpenModal("create")}>Create Room</button>
-                    <button className='bg-white shadow border border-black text-black rounded-sm p-2'>Logout</button>
+                    <button className='bg-white shadow border border-black text-black rounded-sm p-2' onClick={handleLogout}>Logout</button>
                 </div>
             </div>
             <div className='bg-white grid grid-cols-1 p-4 md:grid-cols-2 gap-4 '>
