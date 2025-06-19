@@ -32,7 +32,7 @@ export function CanvasProtectedRoute({ slug, children }: ProtectedRouteProps) {
       }
     }
     checkRoom();
-  }, [roomId, router]);
+  }, [slug, router]);
 
   if (loading) {
     return (

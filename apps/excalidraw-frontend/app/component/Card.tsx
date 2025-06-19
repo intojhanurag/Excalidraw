@@ -6,15 +6,17 @@ interface CardProps{
     onCancel?:()=>void
     onCreate?:(roomName:string)=>void
     createLabel?:string
+    bottomHeading:string
+    placehold:string
 }
 
-export function Card({ heading, onCancel, onCreate, createLabel = "Create" }: CardProps){
+export function Card({ heading, onCancel, onCreate, createLabel ,bottomHeading,placehold}: CardProps){
     const [roomId,setRoomId]=useState("");
 
     return (
         <div className="bg-white p-8 border rounded-2xl">
             <h1 className="text-xl font-bold mb-4">{heading}</h1>
-            <span className="text-gray-500 text-sm">Enter Room Name</span>
+            <span className="text-gray-500 text-sm">{bottomHeading}</span>
             <label className="block text-gray-700 mb-2"></label>
 
             <input
@@ -22,7 +24,7 @@ export function Card({ heading, onCancel, onCreate, createLabel = "Create" }: Ca
                 type="text"
                 value={roomId}
                 onChange={e => setRoomId(e.target.value)}
-                placeholder="Room ID"
+                placeholder={placehold}
             />
             <div className="flex justify-end gap-2">
                 <button

@@ -1,6 +1,6 @@
 "use client"
 import { FiPlus } from 'react-icons/fi';         // Feather Plus
-import { FiUsers,FiCopy,FiEdit2,FiClock } from 'react-icons/fi';
+import { FiUsers,FiCopy,FiEdit2,FiClock,FiCheck,FiTrash2,FiEye} from 'react-icons/fi';
 import { Card } from '../component/Card';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,9 @@ export default function dashboard(){
 
     const [openModal,setOpenModal]=useState<"create"|"join"|null>(null);
     const [rooms,setRooms]=useState<any[]>([]);
-    const [copied,setCopied]=useState(false);
+    const [showParticipants,setShowParticipants]=useState<string|null>(null)
+    const [copiedSlug,setCopiedSlug]=useState<string|null>(null)
+    const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
     const router = useRouter();
 
     const handleLogout = () => {
@@ -23,6 +25,7 @@ export default function dashboard(){
     useEffect(() => {
         const savedRooms = localStorage.getItem("rooms");
         if (savedRooms) {
+
             setRooms(JSON.parse(savedRooms));
         }
     }, []);
@@ -35,7 +38,7 @@ export default function dashboard(){
     async function handleCreateRoom(roomName:string){
         const token=localStorage.getItem("token");
 
-        const res=await fetch("http://localhost:3001/room",{
+        const res=await fetch("http://localhost:3001/create-room",{
             method:"POST",
             headers:{
                 "Content-Type":"application/json",
@@ -47,23 +50,47 @@ export default function dashboard(){
         const data=await res.json();
 
         if(res.ok && data.roomId){
-            console.log(data.roomId)
             fetchRooms();
         }else{
             alert(data.message||"Room creation failed")
         }
     }
 
-    async function  handleJoinRoom(roomSlug:string) {
-        const res=await fetch(`http://localhost:3001/room/${roomSlug}`)
-        const data=await res.json();
+    async function handleJoinRoom(roomSlug: string) {
+        const res = await fetch(`http://localhost:3001/room/${roomSlug}/join`, {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            authorization: "Bearer " + localStorage.getItem("token"),
+            },
+        });
+        const data = await res.json();
 
-        if(data.room){
-
-            router.push(`/canvas/${data.room.slug}`);
-        }else{
-            alert("Room not found")
+        if (data.message === "Joined room") {
+            router.push(`/canvas/${roomSlug}`);
+        } else {
+            alert("Room not found or join failed");
         }
+    }
+
+    async function handleLeaveRoom(slug:string) {
+        const token=localStorage.getItem("token");
+
+        const res=await fetch("http://localhost:3001/leave-room",{
+            method:"POST",
+            headers:{
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+
+            },
+            body: JSON.stringify({ slug }),
+        })
+
+        const data = await res.json();
+        // Optionally show a message or refresh the room list
+        alert(data.message);
+        // Refresh rooms list if needed
+        fetchRooms();
         
     }
 
@@ -77,28 +104,34 @@ export default function dashboard(){
 
         setRooms(data.rooms||[])
         
+        
     }
 
     useEffect(()=>{
         fetchRooms();
     },[])
 
-    function handleCopy(roomId:string){
-        navigator.clipboard.writeText(roomId);
-        setCopied(true);
-        setTimeout(()=>setCopied(false),1500)
-        
+   
+
+    const handleCopy = async(slug: string) => {
+    if (navigator.clipboard) {
+        await navigator.clipboard.writeText(slug)
+        .then(() => {
+            // Optionally show a toast or message
+            setCopiedSlug(slug)
+            setTimeout(() => setCopiedSlug(null), 1500);
+        })
+        .catch(() => {
+            alert("Failed to copy!");
+        });
+    } else {
+        // Fallback for older browsers
+        alert("Clipboard not supported");
     }
+    };
     return (
         <ProtectedRoute>
-            <div>
-             {copied && (
-                <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
-                    <div className="bg-green-600 text-white px-6 py-3 rounded shadow transition">
-                    Room ID copied!
-                    </div>
-                </div>
-            )}
+        <div>
             <div className='flex justify-between items-center px-4 py-4'>
                 <span className=' text-2xl font-kalam cursor-pointer' onClick={()=>router.push("/")}>CoSketch</span>
                 <div className='flex gap-2'>
@@ -140,7 +173,10 @@ export default function dashboard(){
                 </div>
                 
                 {rooms.map(room=>(
-                    <div className='border shadow p-4 flex justify-between'>
+                    <div className='border shadow p-4 flex justify-between cursor-pointer hover:bg-slate-100' key={room.slug}
+                    onMouseEnter={() => setHoveredRoom(room.slug)}
+                    onMouseLeave={() => setHoveredRoom(null)}
+                    >
                         
                         <div className='flex items-center gap-4 '>
                             <FiEdit2/>
@@ -153,21 +189,33 @@ export default function dashboard(){
                                         <FiClock className='hidden md:inline'/>
                                         <span className='pl-2 hidden md:inline'>Created {room.createAt?new Date(room.createAt).toLocaleString():""}</span>
                                     </div>
-                                    <div className='flex items-center'>
+                                    <div className='flex items-center gap-2'>
                                         <span className='md:pl-4 pr-2'>Room Code: {room.slug}</span>
-                                        <FiCopy className='cursor-pointer' onClick={()=>handleCopy(room.id)}/>
+                                        <span>{room.slug}</span>
+                                        
+                                                               
+                                        <span onClick={()=>handleCopy(room.slug)} style={{ cursor: "pointer" }}>
+                                            {copiedSlug===room.slug ? <FiCheck color="green" /> : <FiCopy />}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                             
                         </div>
                         
-                        <div className='flex items-center'>
+                        <div className='flex items-center gap-2'>
                             <FiUsers/>
-                            <span>{room.people}</span>
+                            <span> {room.noOfParticipants}</span>
                             <button className='text-blue-600 pl-6 cursor-pointer' onClick={()=>router.push(`/canvas/${room.slug}`)}>
                                 Join
                             </button>
+                            {hoveredRoom === room.slug && (
+                                <FiTrash2
+                                className="ml-2 cursor-pointer text-red-500"
+                                onClick={()=>handleLeaveRoom(room.slug)}
+                                title="Leave Room"
+                                />
+                            )}
 
                         </div>
                     </div>
@@ -190,12 +238,14 @@ export default function dashboard(){
                             setOpenModal(null);
                         }}
                         createLabel={openModal === "create" ? "Create" : "Join"}
+                        bottomHeading={openModal==="create"?"Enter Room Name":"Enter Room Id"}
+                        placehold={openModal==="create"?"Enter Room Name":"Enter Room Id"}
                     />
                 </div>
             )}
         </div>
 
-        </ProtectedRoute>
+    </ProtectedRoute>
         
     )
 }

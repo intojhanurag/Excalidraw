@@ -12,11 +12,11 @@ interface PageProps {
 
 export default function CanvasPage({params}:PageProps){
     
-    const roomId=params.roomId
+    const slug=params.roomId
     
     return (
-      <CanvasProtectedRoute roomId={roomId}>
-        <RoomCanvas roomId={roomId}/>
+      <CanvasProtectedRoute slug={slug}>
+        <RoomCanvas roomId={slug}/>
       </CanvasProtectedRoute>
     )
     

@@ -5,12 +5,15 @@ import { Card } from "@repo/ui/card";
 import { Pencil, Share2, Users2, Sparkles, Github, Download,Menu,X,Group,Cloud,Image,Star,ChartArea, Linkedin,Twitter,Eye,Phone} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FeatureCard } from "./component/FeatureCard";
+import { features } from "process";
 
 function App() {
   const router=useRouter();
   const [menuOpen,setMenuOpen]=useState(false)
+
+  const featuresRef=useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleResize() {
@@ -22,6 +25,19 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleStartDrawing=()=>{
+    const token=typeof window!=="undefined"?localStorage.getItem("token"):null;
+    if(token){
+      router.push("/dashboard")
+    } else {
+      router.push("/signin")
+    }
+  }
+  const handleFeaturesClick=()=>{
+    featuresRef.current?.scrollIntoView({behavior:"smooth"})
+    
+  }
+
   return (
     <div>
       <header className="flex justify-between rounded-md  mt-8 m-8  border border-gray-200 p-2 md:p-4 shadow-2xl md:pl-6 md:ml-24 md:mr-24 md:pr-6">
@@ -29,10 +45,10 @@ function App() {
           <span className=' text-2xl font-kalam cursor-pointer' onClick={()=>router.push("/")}>CoSketch</span>
         </div>
         <div className="hidden sm:flex gap-5 items-center">
-          <span className="cursor-pointer">Features</span>
-          <span className="cursor-pointer">Github</span>
+          <span className="cursor-pointer" onClick={handleFeaturesClick}>Features</span>
+          <span className="cursor-pointer" onClick={()=>window.open("https://github.com/intojhanurag/Excalidraw","_blank")}>Github</span>
           <span className="cursor-pointer">Signin</span>
-          <span className="bg-black text-white rounded-lg px-2 py-1 pt-1 text-sm cursor-pointer">Try Now</span>
+          <span className="bg-black text-white rounded-lg px-2 py-1 pt-1 text-sm cursor-pointer" onClick={handleStartDrawing}>Try Now</span>
 
         </div>
         { !menuOpen && (
@@ -58,7 +74,7 @@ function App() {
             <div className="font-medium cursor-pointer">Features</div>
             <div className="font-medium cursor-pointer">Github</div>
             <div className="font-medium cursor-pointer">Signin</div>
-            <div className="font-medium cursor-pointer" onClick={()=>(router.push("/signin"))}>Try Now</div>
+            <div className="font-medium cursor-pointer" onClick={handleStartDrawing}>Try Now</div>
 
           </div>
 
@@ -78,16 +94,16 @@ function App() {
           
         </div>
         <div>
-          <button className="bg-black text-white p-2 rounded-xl m-4" onClick={()=>router.push("/signin")}>StartDrawing</button>
+          <button className="bg-black text-white p-2 rounded-xl m-4" onClick={handleStartDrawing}>StartDrawing</button>
           <button className="bg-white text-black border border-black p-2 rounded-xl m-4">WatchDemo</button>
         </div>
 
       </div>
-      <div className="text-center mt-10 font-semibold text-2xl md:text-3xl">
+      <div className="text-center mt-10 font-semibold text-2xl md:text-3xl" ref={featuresRef} id="features">
           Key Features
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center" >
         
         <div className="grid sm:grid-cols-2 gap-4 items-center p-4">
           <div >
