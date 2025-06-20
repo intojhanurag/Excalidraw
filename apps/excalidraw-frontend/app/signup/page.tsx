@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "react-toastify";
+
 
 export default function Signup(){
 
@@ -40,14 +42,17 @@ async function handleSignup(e:React.FormEvent) {
             
             setEmail("");
             setPassword("");
+            toast.success("Signup successful!");
             setTimeout(() => {
-                router.push("/signin");
-            }, 1500); 
+              router.push("/signin");
+            }, 2000); 
             } else {
-            setMessage(data.message || "Signup failed.");
+              console.log(data.message)
+              toast.error(data.message)
             }
         } catch (err) {
-            setMessage("Network error.");
+            console.log(err);
+            toast.error("Signup failed. Please try again")
         }
     }
 

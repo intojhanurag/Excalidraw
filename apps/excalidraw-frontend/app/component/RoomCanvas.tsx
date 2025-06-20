@@ -5,6 +5,7 @@ import { WS_URL } from "@/config";
 import { initDraw } from "../draw";
 import { useEffect, useRef, useState } from "react";
 import { Canvas } from "./Canvas";
+import { ClipLoader } from "react-spinners";
 
 
 export function RoomCanvas({roomId}: {roomId: string}) {
@@ -30,9 +31,11 @@ export function RoomCanvas({roomId}: {roomId: string}) {
     }, [])
    
     if (!socket) {
-        return <div>
-            Connecting to server....
-        </div>
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+                <ClipLoader size={40} color="#36d7b7" />
+            </div>
+        );
     }
 
     return <div>

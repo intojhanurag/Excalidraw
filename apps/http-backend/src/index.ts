@@ -44,10 +44,15 @@ app.post("/signup", async (req, res) => {
             }
         })
         
+        const token = jwt.sign(
+            { userId: user.id },
+            JWT_SECRET
+        );
+
         res.json({
-            userId: user.id
-            
-        })
+            userId: user.id,
+            token 
+        });
     } catch(e) {
         
         res.status(500).json({

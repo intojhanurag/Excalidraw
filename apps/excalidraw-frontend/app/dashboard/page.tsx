@@ -5,6 +5,7 @@ import { Card } from '../component/Card';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '../component/ProtectedRoute';
+import { ClipLoader } from 'react-spinners';
 
 
 export default function dashboard(){
@@ -14,6 +15,11 @@ export default function dashboard(){
     const [showParticipants,setShowParticipants]=useState<string|null>(null)
     const [copiedSlug,setCopiedSlug]=useState<string|null>(null)
     const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
+
+    const [showLogoutConfirm,setShowLoagoutConfirm]=useState(false);
+    const [loading,setLoading]=useState(false)
+
+    const[trashSlug,setTrashSlug]=useState<string|null>(null)
     const router = useRouter();
 
     const handleLogout = () => {
@@ -95,6 +101,7 @@ export default function dashboard(){
     }
 
     async function  fetchRooms() {
+        setLoading(true);
         const token=localStorage.getItem("token");
         const res=await fetch("http://localhost:3001/my-rooms",{
             headers:{Authorization:`Bearer ${token}`}
@@ -103,12 +110,15 @@ export default function dashboard(){
         const data=await res.json();
 
         setRooms(data.rooms||[])
+        setLoading(false)
         
         
     }
 
     useEffect(()=>{
+        setLoading(true);
         fetchRooms();
+        
     },[])
 
    
@@ -136,7 +146,7 @@ export default function dashboard(){
                 <span className=' text-2xl font-kalam cursor-pointer' onClick={()=>router.push("/")}>CoSketch</span>
                 <div className='flex gap-2'>
                     <button className='bg-black text-white rounded-sm p-2' onClick={()=>setOpenModal("create")}>Create Room</button>
-                    <button className='bg-white shadow border border-black text-black rounded-sm p-2' onClick={handleLogout}>Logout</button>
+                    <button className='bg-white shadow border border-black text-black rounded-sm p-2' onClick={()=>setShowLoagoutConfirm(true)}>Logout</button>
                 </div>
             </div>
             <div className='bg-white grid grid-cols-1 p-4 md:grid-cols-2 gap-4 '>
@@ -172,13 +182,21 @@ export default function dashboard(){
             
                 </div>
                 
-                {rooms.map(room=>(
-                    <div className='border shadow p-4 flex justify-between cursor-pointer hover:bg-slate-100' key={room.slug}
+                {loading? (
+                    <div className="flex justify-center items-center h-40">
+                        <ClipLoader size={40} color="#36d7b7" />
+                    </div>
+
+                ):(
+                
+                
+                rooms.map(room=>(
+                    <div className='border shadow p-4 flex justify-between gap-2 cursor-pointer hover:bg-slate-100' key={room.slug}
                     onMouseEnter={() => setHoveredRoom(room.slug)}
                     onMouseLeave={() => setHoveredRoom(null)}
                     >
                         
-                        <div className='flex items-center gap-4 '>
+                        <div className='flex items-center gap-2 md:gap-4'>
                             <FiEdit2/>
                             <div>
                                 <div className='font-bold'>
@@ -187,11 +205,11 @@ export default function dashboard(){
                                 <div className='flex flex-col md:flex-row md:items-center text-sm'>
                                     <div className='flex items-center'>
                                         <FiClock className='hidden md:inline'/>
-                                        <span className='pl-2 hidden md:inline'>Created {room.createAt?new Date(room.createAt).toLocaleString():""}</span>
+                                        <span className='pl-2 hidden md:inline'>Created {room.createdAt?new Date(room.createdAt).toLocaleString():""}</span>
                                     </div>
-                                    <div className='flex items-center gap-2'>
+                                    <div className='flex items-center gap-2 justify-between'>
                                         <span className='md:pl-4 pr-2'>Room Code: {room.slug}</span>
-                                        <span>{room.slug}</span>
+                                       
                                         
                                                                
                                         <span onClick={()=>handleCopy(room.slug)} style={{ cursor: "pointer" }}>
@@ -212,13 +230,13 @@ export default function dashboard(){
                             {hoveredRoom === room.slug && (
                                 <FiTrash2
                                 className="ml-2 cursor-pointer text-red-500"
-                                onClick={()=>handleLeaveRoom(room.slug)}
+                                onClick={()=>setTrashSlug(room.slug)}
                                 title="Leave Room"
                                 />
                             )}
 
                         </div>
-                    </div>
+                    </div>)
                 ))}
                 
             </div>
@@ -244,6 +262,53 @@ export default function dashboard(){
                 </div>
             )}
         </div>
+        {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+            <div className="text-lg font-semibold mb-4">Are you sure you want to logout?</div>
+            <div className="flex gap-4">
+                <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={handleLogout}
+                >
+                Yes
+                </button>
+                <button
+                className="bg-gray-300 text-black px-4 py-2 rounded"
+                onClick={() => setShowLoagoutConfirm(false)}
+                >
+                Cancel
+                </button>
+            </div>
+            </div>
+        </div>
+        )}
+
+        {trashSlug && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center border">
+            <div className="text-lg font-semibold mb-4 items-center">
+                Are you sure you want to delete this room?
+                
+                This action cannot be undone?
+            </div>
+            <div className="flex gap-4">
+                <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={()=>handleLeaveRoom(trashSlug)}
+                >
+                Yes
+                </button>
+                <button
+                className="bg-gray-300 text-black px-4 py-2 rounded"
+                onClick={()=>setTrashSlug(null)}
+                >
+                Cancel
+                </button>
+            </div>
+            </div>
+        </div>
+        )}
 
     </ProtectedRoute>
         

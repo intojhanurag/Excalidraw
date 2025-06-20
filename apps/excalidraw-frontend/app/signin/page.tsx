@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiEye,FiEyeOff } from "react-icons/fi";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function Signin(){
 
@@ -33,16 +34,19 @@ export default function Signin(){
         document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
         localStorage.setItem("token", data.token); // (optional, for client use)
         setMessage("Signin successful! Redirecting...");
+        toast.success("Signin successful!");
         setTimeout(() => {
           router.push("/dashboard");
-        }, 1200);
+        }, 2000); 
       }
       
       else {
-        setMessage(data.message || "Signin failed.");
+
+        toast.error(data.message)
       }
     } catch (err) {
       setMessage("Network error.");
+      toast.error("Signin failed. Please try again")
     }
 
 

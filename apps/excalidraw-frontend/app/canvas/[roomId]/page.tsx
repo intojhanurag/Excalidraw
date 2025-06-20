@@ -10,13 +10,13 @@ interface PageProps {
 }
 
 
-export default function CanvasPage({params}:PageProps){
+export default async  function CanvasPage({params}:PageProps){
     
-    const slug=params.roomId
+    const {roomId}=await params
     
     return (
-      <CanvasProtectedRoute slug={slug}>
-        <RoomCanvas roomId={slug}/>
+      <CanvasProtectedRoute slug={roomId}>
+        <RoomCanvas roomId={roomId}/>
       </CanvasProtectedRoute>
     )
     
