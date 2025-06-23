@@ -1,5 +1,4 @@
 import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
-import { initDraw } from "../draw";
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./icon";
 import { Game } from "../draw/Game";
@@ -57,7 +56,9 @@ function Topbar({selectedTool,setSelectedTool}:{
         top:20,
         left:"50%",
         transform:"translateX(-50%)",
-        zIndex:10
+        zIndex:10,
+        backgroundColor:"#202020",
+        borderRadius:"10px"
     }}>
         <div className="flex gap-t">
             <IconButton 
