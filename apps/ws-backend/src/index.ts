@@ -51,6 +51,9 @@ wss.on('connection',function connection(ws,request){
         ws
     })
 
+    
+
+
     ws.on('message',async function message(data){
         let parsedData;
         if(typeof data!=="string"){
@@ -74,23 +77,30 @@ wss.on('connection',function connection(ws,request){
        
 
         if(parsedData.type==="chat"){
-            const roomId=parsedData.roomId;
+            const room=await prismaClient.room.findUnique({
+                where:{slug:parsedData.roomId}
+            })
+
+            if(!room){
+                console.error("Room not found for slug: ",parsedData)
+                return;
+            }
             const message=parsedData.message
 
             await prismaClient.chat.create({
                 data:{
-                    roomId:Number(roomId),
+                    roomId:room.id,
                     message,
                     userId
                 }
             })
 
             users.forEach(user=>{
-                if(user.rooms.includes(roomId)){
+                if(user.rooms.includes(parsedData.roomId)){
                     user.ws.send(JSON.stringify({
                         type:"chat",
-                        message:"message",
-                        roomId
+                        message:message,
+                        roomId:parsedData.roomId
                     }))
                 }
             })

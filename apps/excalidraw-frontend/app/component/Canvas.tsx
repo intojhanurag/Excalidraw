@@ -15,42 +15,31 @@ export function Canvas({
 }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    console.log(roomId);
+
     const [game,setGame]=useState<Game>();
     const [selectedTool, setSelectedTool] = useState<Tool>("circle")
+
 
     useEffect(()=>{
         game?.setTool(selectedTool)
     },[selectedTool,game])
 
-    useEffect(()=>{
-        //@ts-ignore
-        if(canvasRef.current){
-            const g=new Game(canvasRef.current,roomId,socket);
-            setGame(g);
-            return ()=>{
-                g.destroy();
-            }
-        }
-        
-    },[selectedTool])
-    
-   
-   
-
     useEffect(() => {
+    if (!canvasRef.current) return;
 
-        if (canvasRef.current) {
-           initDraw(canvasRef.current,roomId,socket)
-           
-        }
-        
+    const g = new Game(canvasRef.current, roomId, socket);
+    setGame(g);
 
-
-    }, [canvasRef]);
+    return () => {
+        g.destroy();
+    };
+    }, []);
 
     return <div style={{
         height:"100vh",
-        overflow:"hidden"
+        overflow:"hidden",
+        background:"black"
 
     }}>
         <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}></canvas>
@@ -65,8 +54,10 @@ function Topbar({selectedTool,setSelectedTool}:{
 }){
     return <div style={{
         position:"fixed",
-        top:10,
-        left:10
+        top:20,
+        left:"50%",
+        transform:"translateX(-50%)",
+        zIndex:10
     }}>
         <div className="flex gap-t">
             <IconButton 
