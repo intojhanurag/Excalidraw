@@ -1,10 +1,10 @@
-import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
+import { Circle, Pencil, RectangleHorizontalIcon,PenLine,Minus} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./icon";
 import { Game } from "../draw/Game";
 
 
-export type Tool="circle"|"rect"|"pencil"
+export type Tool="circle"|"rect"|"pencil"|"line"
 export function Canvas({
     roomId,
     socket
@@ -13,8 +13,6 @@ export function Canvas({
     roomId: string;
 }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-
-    console.log(roomId);
 
     const [game,setGame]=useState<Game>();
     const [selectedTool, setSelectedTool] = useState<Tool>("circle")
@@ -36,8 +34,8 @@ export function Canvas({
     }, []);
 
     return <div style={{
-        height:"100vh",
-        overflow:"hidden",
+        minHeight:"100vh",
+        overflow:"auto",
         background:"black"
 
     }}>
@@ -61,19 +59,26 @@ function Topbar({selectedTool,setSelectedTool}:{
         borderRadius:"10px"
     }}>
         <div className="flex gap-t">
-            <IconButton 
+                <IconButton 
                     onClick={() => {
                         setSelectedTool("pencil")
                     }}
                     activated={selectedTool === "pencil"}
                     icon={<Pencil />}
                 />
+
                 <IconButton onClick={() => {
                     setSelectedTool("rect")
                 }} activated={selectedTool === "rect"} icon={<RectangleHorizontalIcon />} ></IconButton>
+
                 <IconButton onClick={() => {
                     setSelectedTool("circle")
                 }} activated={selectedTool === "circle"} icon={<Circle />}></IconButton>
+
+
+                <IconButton onClick={() => {
+                    setSelectedTool("line")
+                }} activated={selectedTool === "line"} icon={<Minus />}></IconButton>
         </div>
         
 
