@@ -23,7 +23,48 @@ type Shape = {
     x2:number;
     y2:number;
 
+} | {
+    type:"arrow";
+    x1:number;
+    y1:number;
+    x2:number;
+    y2:number
 }
+
+function drawArrow(ctx:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number)
+{
+    const headlen=15;
+    const dx=x2-x1;
+    const dy=y2-y1;
+
+    const angle=Math.atan2(dy,dx);
+
+
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+
+    ctx.stroke();
+
+    ctx.beginPath();
+
+    ctx.moveTo(x2,y2);
+
+    ctx.lineTo(
+        x2-headlen*Math.cos(angle-Math.PI/6),
+        y2-headlen*Math.sin(angle-Math.PI/6)
+    )
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(
+        x2-headlen*Math.cos(angle+Math.PI/6),
+        y2-headlen*Math.sin(angle+Math.PI/6)
+    )
+
+   
+    ctx.stroke();
+
+}
+
 
 export class Game{
     private canvas:HTMLCanvasElement
@@ -60,7 +101,7 @@ export class Game{
         this.canvas.removeEventListener("mousemove", this.mouseMoveHandler)
     }
     
-    setTool(tool:"circle"|"pencil"|"rect"|"line"){
+    setTool(tool:"circle"|"pencil"|"rect"|"line"|"arrow"){
         this.selectedTool=tool
     }
     async init(){
@@ -119,6 +160,9 @@ export class Game{
                 this.ctx.lineTo(shape.x2, shape.y2);
                 this.ctx.stroke();
                 this.ctx.closePath();
+            } else if(shape.type=="arrow"){
+                this.ctx.strokeStyle="rgba(255,255,255)";
+                drawArrow(this.ctx, shape.x1, shape.y1, shape.x2, shape.y2);
             }
         })
 
@@ -173,8 +217,18 @@ export class Game{
                 y1:this.startY,
                 x2:e.clientX,
                 y2:e.clientY
-            }
+            } 
                 
+        }else if(selectedTool==="arrow"){
+
+            shape={
+                type:"arrow",
+                x1:this.startX,
+                y1:this.startY,
+                x2:e.clientX,
+                y2:e.clientY
+            }
+
         }
 
         if (!shape) {
@@ -222,6 +276,11 @@ export class Game{
             this.ctx.lineTo(e.clientX,e.clientY)
             this.ctx.stroke();
             this.ctx.closePath();
+        }
+        else if(this.selectedTool==="arrow"){
+            this.clearCanvas();
+            this.ctx.strokeStyle="rgba(255,255,255)";
+            drawArrow(this.ctx,this.startX,this.startY,e.clientX,e.clientY)
         }
         else{
             const width = e.clientX - this.startX;

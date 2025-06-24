@@ -1,10 +1,10 @@
-import { Circle, Pencil, RectangleHorizontalIcon,PenLine,Minus} from "lucide-react";
+import { Circle, Pencil, RectangleHorizontalIcon,ArrowBigRight,Minus} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./icon";
 import { Game } from "../draw/Game";
 
 
-export type Tool="circle"|"rect"|"pencil"|"line"
+export type Tool="circle"|"rect"|"pencil"|"line"|"arrow"
 export function Canvas({
     roomId,
     socket
@@ -78,7 +78,11 @@ function Topbar({selectedTool,setSelectedTool}:{
 
                 <IconButton onClick={() => {
                     setSelectedTool("line")
-                }} activated={selectedTool === "line"} icon={<Minus />}></IconButton>
+                }} activated={selectedTool === "line"} icon={<Minus/>}></IconButton>
+
+                <IconButton onClick={() => {
+                    setSelectedTool("arrow")
+                }} activated={selectedTool === "arrow"} icon={<ArrowBigRight />}></IconButton>
         </div>
         
 
