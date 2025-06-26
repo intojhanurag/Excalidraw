@@ -6,6 +6,7 @@ import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/t
 import { prismaClient } from "@repo/db/client";
 import bcrypt from "bcrypt"
 import cors from 'cors'
+import { where } from "sequelize";
 
 const app = express();
 app.use(express.json());
@@ -164,8 +165,6 @@ app.post("/room/:slug/join", middleware, async (req, res) => {
     });
 });
 
-
-
 app.get("/my-rooms",middleware,async(req,res)=>{
 
     // this will give us the all rooms in which i am the member of that room
@@ -243,9 +242,14 @@ app.post("/leave-room", middleware, async (req, res) => {
     }
 
     if (room?.users.length === 1 && room?.users[0]?.id === userId) {
+      await prismaClient.chat.deleteMany({
+        where:{
+        room:{slug}
+      }
+      });
       // Only one user (the current user), delete the room
       await prismaClient.room.delete({ where: { slug } });
-      res.json({ message: "Room deleted" });
+      
     } else {
       // More than one user, disconnect the user from the room
       await prismaClient.room.update({

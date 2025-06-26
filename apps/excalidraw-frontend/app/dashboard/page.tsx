@@ -16,6 +16,8 @@ export default function dashboard(){
     const [copiedSlug,setCopiedSlug]=useState<string|null>(null)
     const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
 
+   
+
     const [showLogoutConfirm,setShowLoagoutConfirm]=useState(false);
     const [loading,setLoading]=useState(false)
 
@@ -98,10 +100,13 @@ export default function dashboard(){
         })
 
         const data = await res.json();
+        
         // Optionally show a message or refresh the room list
+
         alert(data.message);
         // Refresh rooms list if needed
         fetchRooms();
+        setTrashSlug(null);
         
     }
 

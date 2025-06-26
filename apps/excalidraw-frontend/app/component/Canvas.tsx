@@ -1,7 +1,9 @@
-import { Circle, Pencil, RectangleHorizontalIcon,ArrowBigRight,Minus} from "lucide-react";
+import { Circle, Pencil, RectangleHorizontalIcon,ArrowBigRight,Minus,LogOut} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./icon";
 import { Game } from "../draw/Game";
+import { FiLogOut } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 
 export type Tool="circle"|"rect"|"pencil"|"line"|"arrow"
@@ -16,7 +18,7 @@ export function Canvas({
 
     const [game,setGame]=useState<Game>();
     const [selectedTool, setSelectedTool] = useState<Tool>("circle")
-
+    
 
     useEffect(()=>{
         game?.setTool(selectedTool)
@@ -45,10 +47,13 @@ export function Canvas({
 }
 
 
+
 function Topbar({selectedTool,setSelectedTool}:{
     selectedTool:Tool,
     setSelectedTool:(s:Tool)=>void
 }){
+    const [exitbutton,selectexistbutton]=useState(false);
+    const router=useRouter();
     return <div style={{
         position:"fixed",
         top:20,
@@ -83,9 +88,16 @@ function Topbar({selectedTool,setSelectedTool}:{
                 <IconButton onClick={() => {
                     setSelectedTool("arrow")
                 }} activated={selectedTool === "arrow"} icon={<ArrowBigRight />}></IconButton>
+
+                <div     
+                className={`m-2 pointer rounded-full border hover:opacity-70 p-2 bg-black cursor-pointer text-white hover:bg-gray ${exitbutton ? "bg-blue-500" : "text-white"  }` }       
+                onClick={() => {   
+                    router.push("/dashboard")
+                }}><LogOut/></div>
         </div>
         
 
     </div>
+
 }
 
