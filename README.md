@@ -31,11 +31,3 @@ A lightweight Excalidraw-like web application that enables **real-time collabora
 - Deployment: Vercel / Render (still pending)
 
 ---
-
-## 📦 Installation
-
-```bash
-git clone https://github.com/your-username/collabdraw.git
-cd collabdraw
-npm install
-npm start
