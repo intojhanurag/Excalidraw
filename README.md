@@ -25,10 +25,10 @@ A lightweight Excalidraw-like web application that enables **real-time collabora
 
 ## 🛠 Tech Stack
 
-- Frontend: HTML, CSS, JavaScript
+- Frontend: Nextjs, ShadCn, Tailwind CSS
 - WebSocket Server: Node.js with `ws`
 - Canvas Rendering: Pure HTML5 Canvas API
-- Deployment: Vercel / Render (optional)
+- Deployment: Vercel / Render (still pending)
 
 ---
 
